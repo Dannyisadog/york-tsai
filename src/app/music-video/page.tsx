@@ -1,6 +1,6 @@
 import { VideoList } from "@/components/VideoList";
 
-export default function Home() {
+export default function MusicVideo() {
   return (
     <div>
       <VideoList />
