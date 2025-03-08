@@ -1,10 +1,9 @@
-interface VideoPageProps {
-  params: { id: string };
+interface VideoPage {
+  params: Promise<{ id: string }>;
 }
 
-export default async function VideoPage(props: VideoPageProps) {
-  const { params } = props;
+export default async function VideoPage(props: VideoPage) {
+  const { params } = await props;
   const { id } = await params;
-
-  return <h1>Video Page {id}</h1>;
+  return <div>My Post: {id}</div>;
 }
