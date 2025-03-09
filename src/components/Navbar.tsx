@@ -1,5 +1,10 @@
+"use client";
+
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
+import styles from "./Navbar.module.css";
+import { usePathname } from "next/navigation";
 
 const items = [
   {
@@ -32,15 +37,19 @@ interface NavbarItemProps {
   title: string;
   href: string;
   style: React.CSSProperties;
+  isActive?: boolean;
 }
 
 const NavbarItem = (props: NavbarItemProps) => {
-  const { title, href, style } = props;
+  const { title, href, style, isActive } = props;
   return (
     <li
       key={title}
+      className={styles.navbar_item}
       style={{
-        color: "white",
+        color: isActive ? "white" : "#acacac",
+        fontWeight: isActive ? "bold" : "normal",
+        fontSize: isActive ? "18px" : "16px",
         ...style,
       }}
     >
@@ -50,6 +59,10 @@ const NavbarItem = (props: NavbarItemProps) => {
 };
 
 export const Navbar = () => {
+  const { data: session } = useSession();
+
+  const pathname = usePathname();
+
   return (
     <nav
       style={{
@@ -66,7 +79,13 @@ export const Navbar = () => {
       </Link>
       <div>
         <ul
-          style={{ display: "flex", listStyle: "none", margin: 0, padding: 0 }}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            listStyle: "none",
+            margin: 0,
+            padding: 0,
+          }}
         >
           {items.map((item, index) => (
             <NavbarItem
@@ -74,8 +93,19 @@ export const Navbar = () => {
               title={item.title}
               href={item.href}
               style={{ margin: index !== items.length - 1 ? "0 12px" : "0" }}
+              isActive={pathname === item.href}
             />
           ))}
+          {session && (
+            <li
+              className={styles.navbar_item}
+              onClick={() => {
+                signOut();
+              }}
+            >
+              <span>Logout</span>
+            </li>
+          )}
         </ul>
       </div>
     </nav>
