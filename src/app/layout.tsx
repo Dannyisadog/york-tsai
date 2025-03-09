@@ -30,13 +30,7 @@ export default function RootLayout({
         className={`${styles.container} ${geistSans.variable} ${geistMono.variable}`}
       >
         <Navbar />
-        <div
-          style={{
-            margin: "80px 0",
-          }}
-        >
-          {children}
-        </div>
+        {children}
       </body>
     </html>
   );
