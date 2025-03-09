@@ -3,7 +3,7 @@ import React from "react";
 
 const items = [
   {
-    title: "Featured",
+    title: "Commercial",
     href: "/",
   },
   {
@@ -11,20 +11,20 @@ const items = [
     href: "/music-video",
   },
   {
-    title: "Commercial",
-    href: "/commercial",
+    title: "Live Session",
+    href: "/live-session",
   },
   {
-    title: "Narrative",
-    href: "/narrative",
+    title: "Concert",
+    href: "/concert",
   },
   {
-    title: "Reel",
-    href: "/reel",
+    title: "Highlight",
+    href: "/highlight",
   },
   {
-    title: "Contact",
-    href: "/contact",
+    title: "Reels & Shorts",
+    href: "/reels-shorts",
   },
 ];
 
@@ -73,7 +73,7 @@ export const Navbar = () => {
               key={index}
               title={item.title}
               href={item.href}
-              style={{ margin: index !== items.length - 1 ? "0 20px" : "0" }}
+              style={{ margin: index !== items.length - 1 ? "0 12px" : "0" }}
             />
           ))}
         </ul>
