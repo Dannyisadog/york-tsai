@@ -1,0 +1,10 @@
+.navbar_item {
+  color: #acacac;
+  cursor: pointer;
+  margin-left: 12px;
+  transition: color 0.3s;
+}
+
+.navbar_item:hover {
+  color: white !important;
+}
