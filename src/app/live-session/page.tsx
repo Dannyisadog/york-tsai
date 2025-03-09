@@ -1,9 +1,9 @@
 import { VideoList } from "@/components/VideoList";
 
-export default function MusicVideo() {
+export default function LiveSession() {
   return (
     <div>
-      <h1>Music Video</h1>
+      <h1>Live Session</h1>
       <div
         style={{
           marginTop: 40,

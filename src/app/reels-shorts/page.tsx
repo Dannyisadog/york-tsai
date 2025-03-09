@@ -1,9 +1,9 @@
 import { VideoList } from "@/components/VideoList";
 
-export default function MusicVideo() {
+export default function Highlight() {
   return (
     <div>
-      <h1>Music Video</h1>
+      <h1>Reels & Shorts</h1>
       <div
         style={{
           marginTop: 40,

@@ -3,7 +3,14 @@ import { VideoList } from "@/components/VideoList";
 export default function Home() {
   return (
     <div>
-      <VideoList />
+      <h1>Commercial</h1>
+      <div
+        style={{
+          marginTop: 40,
+        }}
+      >
+        <VideoList />
+      </div>
     </div>
   );
 }
