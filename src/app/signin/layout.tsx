@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Navbar } from "../components/Navbar";
-import styles from "./layout.module.css";
-import { SessionProvider } from "next-auth/react";
+import "../globals.css";
+import styles from "../layout.module.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,11 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "York Tsai",
-  description: "York Tsai's personal website",
+  title: "Signin",
+  robots: "noindex, nofollow",
 };
 
-export default function RootLayout({
+export default function SigninLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -30,10 +28,7 @@ export default function RootLayout({
       <body
         className={`${styles.container} ${geistSans.variable} ${geistMono.variable}`}
       >
-        <SessionProvider>
-          <Navbar />
-          {children}
-        </SessionProvider>
+        {children}
       </body>
     </html>
   );
