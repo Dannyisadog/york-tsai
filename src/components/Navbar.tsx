@@ -5,7 +5,10 @@ import Link from "next/link";
 import React from "react";
 import styles from "./Navbar.module.css";
 import { usePathname } from "next/navigation";
-
+import { Button, Stack, Typography } from "@mui/material";
+import { CreateVideoModal } from "./CreateVideoModal";
+import useDisclosure from "@/hooks/useDisclosure";
+import AddIcon from '@mui/icons-material/Add';
 const items = [
   {
     title: "Commercial",
@@ -60,54 +63,72 @@ const NavbarItem = (props: NavbarItemProps) => {
 
 export const Navbar = () => {
   const { data: session } = useSession();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const pathname = usePathname();
 
   return (
-    <nav
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        height: "180px",
-      }}
-    >
-      <Link href="/">
-        <span style={{ fontWeight: "bold", fontSize: "48px", color: "white" }}>
-          YORK TSAI
-        </span>
-      </Link>
-      <div>
-        <ul
-          style={{
-            display: "flex",
-            alignItems: "center",
-            listStyle: "none",
-            margin: 0,
-            padding: 0,
+    <Stack height={180} justifyContent="center" spacing={4}>
+      <nav
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Link href="/">
+          <span style={{ fontWeight: "bold", fontSize: "48px", color: "white" }}>
+            YORK TSAI
+          </span>
+        </Link>
+        <div>
+          <ul
+            style={{
+              display: "flex",
+              alignItems: "center",
+              listStyle: "none",
+              margin: 0,
+              padding: 0,
+            }}
+          >
+            {items.map((item, index) => (
+              <NavbarItem
+                key={index}
+                title={item.title}
+                href={item.href}
+                style={{ margin: index !== items.length - 1 ? "0 12px" : "0" }}
+                isActive={pathname === item.href}
+              />
+            ))}
+            {session && (
+              <li
+                className={styles.navbar_item}
+                onClick={() => {
+                  signOut();
+                }}
+              >
+                <span>Logout</span>
+              </li>
+            )}
+          </ul>
+        </div>
+      </nav>
+      {
+        session && <>
+          <Button variant="contained" style={{
+            width: 120,
+            backgroundColor: "black",
+            boxShadow: "0 0 10px 0 rgba(173, 173, 173, 0.5)",
+            borderRadius: 100,
           }}
-        >
-          {items.map((item, index) => (
-            <NavbarItem
-              key={index}
-              title={item.title}
-              href={item.href}
-              style={{ margin: index !== items.length - 1 ? "0 12px" : "0" }}
-              isActive={pathname === item.href}
-            />
-          ))}
-          {session && (
-            <li
-              className={styles.navbar_item}
-              onClick={() => {
-                signOut();
-              }}
-            >
-              <span>Logout</span>
-            </li>
-          )}
-        </ul>
-      </div>
-    </nav>
+            onClick={onOpen}
+          >
+            <Typography variant="body2" color="white">新增影片</Typography>
+            <AddIcon sx={{ color: 'white', fontSize: 18 }} />
+          </Button>
+          <CreateVideoModal open={isOpen} onClose={onClose} />
+        </>
+      }
+    </Stack>
   );
 };

@@ -1,0 +1,35 @@
+model Video {
+  id           String    @id @default(uuid())
+  title        String
+  description  String
+  youtube_link String
+  cover_image  String
+  video_type   VideoType
+  is_active    Boolean   @default(true)
+  is_deleted   Boolean   @default(false)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @default(now()) @updatedAt
+
+  images VideoImage[]
+}
+
+enum VideoType {
+  Commercial
+  MusicVideo
+  LiveSession
+  Concert
+  Highlight
+  ReelsAndShorts
+}
+
+model VideoImage {
+  id         String   @id @default(uuid())
+  video_id   String
+  image_url  String
+  is_active  Boolean  @default(true)
+  is_deleted Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  video Video @relation(fields: [video_id], references: [id])
+}
