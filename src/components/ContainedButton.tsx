@@ -1,12 +1,12 @@
-import { Button as MuiButton } from "@mui/material";
+import { CircularProgress, Button as MuiButton, ButtonProps as MuiButtonProps } from "@mui/material";
 
-interface ContainedButtonProps {
+interface ContainedButtonProps extends MuiButtonProps {
   children: React.ReactNode;
-  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  isLoading?: boolean;
 }
 
 export const ContainedButton = (props: ContainedButtonProps) => {
-  const { children, onClick } = props;
+  const { children, isLoading, ...rest } = props;
   return (
     <MuiButton
       variant="contained"
@@ -15,9 +15,9 @@ export const ContainedButton = (props: ContainedButtonProps) => {
         color: 'black',
         '&:hover': { backgroundColor: '#e0e0e0' }
       }}
-      onClick={onClick}
+      {...rest}
     >
-      {children}
+      {isLoading ? <CircularProgress size={20} sx={{ color: 'black' }} /> : children}
     </MuiButton>
   );
 }
