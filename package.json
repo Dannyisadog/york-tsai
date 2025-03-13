@@ -10,6 +10,12 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@emotion/cache": "^11.14.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.7",
+    "@mui/material": "^6.4.7",
+    "@mui/material-nextjs": "^6.4.3",
     "@prisma/client": "6.4.1",
     "bcryptjs": "^3.0.2",
     "next": "15.2.1",

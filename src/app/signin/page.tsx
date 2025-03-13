@@ -1,60 +1,20 @@
-"use client";
+import { Metadata } from "next";
+import SignInForm from "./SigninForm";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
-import { signIn, useSession } from "next-auth/react";
-import { useState } from "react";
-import styles from "./signin.module.css";
-import { SyntheticEvent } from "react";
-
-export default function SignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { data: session } = useSession();
-
-  if (session) {
-    window.location.href = "/";
-  }
-
-  const handleSubmit = async (e: SyntheticEvent) => {
-    e.preventDefault();
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-
-    if (result && !result.error) {
-      window.location.href = "/";
-    }
+export const generateMetadata = (): Metadata => {
+  return {
+    title: "Sign In",
+    description: "Sign In to your account",
+    robots: "noindex, nofollow",
   };
+};
 
-  return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Sign In</h1>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        <label className={styles.label}>
-          Email:
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className={styles.input}
-          />
-        </label>
-        <label className={styles.label}>
-          Password:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className={styles.input}
-          />
-        </label>
-        <button type="submit" className={styles.button}>
-          Sign In
-        </button>
-      </form>
-    </div>
-  );
+export default async function SignIn() {
+  const session = await auth();
+  if (session) {
+    redirect("/");
+  }
+  return <SignInForm />;
 }
