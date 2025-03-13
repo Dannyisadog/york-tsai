@@ -2,8 +2,15 @@ import { PrismaClient, Video, VideoImage, VideoType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const listVideos = async (): Promise<Video[]> => {
-  const videos = await prisma.video.findMany();
+export const listVideos = async (type: VideoType): Promise<Video[]> => {
+  const videos = await prisma.video.findMany({
+    where: {
+      video_type: type,
+    },
+    orderBy: {
+      created_at: "desc",
+    },
+  });
   return videos;
 }
 
@@ -19,7 +26,7 @@ export const getVideo = async (id: string): Promise<Video> => {
   return video;
 }
 
-interface CreateVideo {
+export interface CreateVideo {
   title: string;
   description: string;
   youtubeLink: string;

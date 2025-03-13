@@ -6,9 +6,10 @@ interface TextFieldProps {
   label: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
 }
 
-export const TextField = ({ label, value, onChange }: TextFieldProps) => {
+export const TextField = ({ label, value, onChange, error }: TextFieldProps) => {
   return (
     <Stack spacing={1}>
       <Typography variant="subtitle2" sx={{ color: '#999' }}>{label}</Typography>
@@ -25,6 +26,7 @@ export const TextField = ({ label, value, onChange }: TextFieldProps) => {
           '& .MuiInputLabel-root': { color: '#999' }
         }}
       />
+      {error && <Typography variant="caption" sx={{ color: 'red' }}>{error}</Typography>}
     </Stack>
   )
 }

@@ -1,9 +1,11 @@
 import { auth } from "@/auth";
 import { createVideo, listVideos } from "@/app/services/video.service";
 import { NextResponse } from "next/server";
+import { VideoType } from "@prisma/client";
 
-export const GET = auth(async () => {
-  const videos = await listVideos();
+export const GET = auth(async (req) => {
+  const type = req.nextUrl.searchParams.get('type');
+  const videos = await listVideos(type as VideoType);
   return NextResponse.json(videos);
 }) as any;
 

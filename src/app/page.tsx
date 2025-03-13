@@ -1,4 +1,5 @@
 import { VideoList } from "@/components/VideoList";
+import { VideoType } from "@prisma/client";
 
 export default function Home() {
   return (
@@ -9,7 +10,7 @@ export default function Home() {
           marginTop: 40,
         }}
       >
-        <VideoList />
+        <VideoList type={VideoType.Commercial} />
       </div>
     </div>
   );

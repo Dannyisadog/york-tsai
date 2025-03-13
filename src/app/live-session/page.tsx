@@ -1,5 +1,5 @@
 import { VideoList } from "@/components/VideoList";
-
+import { VideoType } from "@prisma/client";
 export default function LiveSession() {
   return (
     <div>
@@ -9,7 +9,7 @@ export default function LiveSession() {
           marginTop: 40,
         }}
       >
-        <VideoList />
+        <VideoList type={VideoType.LiveSession} />
       </div>
     </div>
   );
