@@ -5,5 +5,5 @@ interface VideoPage {
 export default async function VideoPage(props: VideoPage) {
   const { params } = await props;
   const { id } = await params;
-  return <div>My Post: {id}</div>;
+  return <div>Video Page: {id}</div>;
 }
