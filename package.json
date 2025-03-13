@@ -17,9 +17,12 @@
     "@mui/material": "^6.4.7",
     "@mui/material-nextjs": "^6.4.3",
     "@prisma/client": "6.4.1",
+    "axios": "^1.8.3",
     "bcryptjs": "^3.0.2",
     "next": "15.2.1",
     "next-auth": "5.0.0-beta.25",
+    "oci-common": "^2.105.0",
+    "oci-objectstorage": "^2.105.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
