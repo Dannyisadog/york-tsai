@@ -16,11 +16,14 @@ const VideoItem = (props: VideoItemProps) => {
           color: "#f0f0f0",
           width: "100%",
           height: 200,
-          backgroundColor: "#f0f0f0",
+          border: "1px solid #f0f0f0",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           ...style,
         }}
       >
-        {title}
+        Fake Video
       </li>
     </Link>
   );
