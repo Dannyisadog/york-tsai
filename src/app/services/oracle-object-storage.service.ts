@@ -59,7 +59,7 @@ export class OracleStorageService {
   
 
   getDownloadPath(objectName: string): string {
-    return `${this.bucketUrl}/n/nrc4dqcwkk3t/b/${this.bucketName}/o/${objectName}`;
+    return `${this.bucketUrl}/n/${this.namespace}/b/${this.bucketName}/o/${objectName}`;
   }
 
   getImagePath(objectName: string): string {
