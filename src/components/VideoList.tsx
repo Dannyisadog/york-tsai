@@ -1,13 +1,16 @@
+import { listVideos } from "@/app/services/video.service";
+import { Box, Typography } from "@mui/material";
+import { VideoType } from "@prisma/client";
 import Link from "next/link";
 
 interface VideoItemProps {
   title: string;
   href: string;
-  style: React.CSSProperties;
+  imageUrl: string;
 }
 
 const VideoItem = (props: VideoItemProps) => {
-  const { title, href, style } = props;
+  const { title, href, imageUrl } = props;
   return (
     <Link href={href}>
       <li
@@ -15,35 +18,64 @@ const VideoItem = (props: VideoItemProps) => {
         style={{
           color: "#f0f0f0",
           width: "100%",
-          height: 200,
-          border: "1px solid #f0f0f0",
+          aspectRatio: "16/9",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          ...style,
+          position: "relative",
+          overflow: "hidden",
         }}
       >
-        Fake Video
+        <Box
+          component="img"
+          src={imageUrl}
+          alt={title}
+          sx={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transition: "transform 0.3s ease-in-out",
+            "&:hover": {
+              transform: "scale(1.1)",
+            }
+          }}
+        />
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.7)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: 0,
+            transition: "opacity 0.3s ease-in-out",
+            "&:hover": {
+              opacity: 1
+            }
+          }}
+        >
+          <Typography variant="h3" sx={{
+            padding: 2
+          }}>
+            {title}
+          </Typography>
+        </Box>
       </li>
     </Link>
   );
 };
 
-export const VideoList = () => {
-  const videos = [
-    { title: "Video 1", href: "/video1", style: {} },
-    { title: "Video 2", href: "/video2", style: {} },
-    { title: "Video 3", href: "/video3", style: {} },
-    { title: "Video 4", href: "/video4", style: {} },
-    { title: "Video 5", href: "/video5", style: {} },
-    { title: "Video 6", href: "/video6", style: {} },
-    { title: "Video 7", href: "/video7", style: {} },
-    { title: "Video 8", href: "/video8", style: {} },
-    { title: "Video 9", href: "/video9", style: {} },
-    { title: "Video 10", href: "/video10", style: {} },
-    { title: "Video 11", href: "/video11", style: {} },
-    { title: "Video 12", href: "/video12", style: {} },
-  ];
+interface VideoListProps {
+  type: VideoType;
+}
+
+export const VideoList = async (props: VideoListProps) => {
+  const { type } = props;
+  const videos = await listVideos(type);
 
   return (
     <ul
@@ -56,7 +88,12 @@ export const VideoList = () => {
       }}
     >
       {videos.map((video) => (
-        <VideoItem key={video.title} {...video} />
+        <VideoItem
+          key={video.id}
+          title={video.title}
+          href={`/video/${video.id}`}
+          imageUrl={video.cover_image}
+        />
       ))}
     </ul>
   );

@@ -1,5 +1,5 @@
 import { VideoList } from "@/components/VideoList";
-
+import { VideoType } from "@prisma/client";
 export default function MusicVideo() {
   return (
     <div>
@@ -9,7 +9,7 @@ export default function MusicVideo() {
           marginTop: 40,
         }}
       >
-        <VideoList />
+        <VideoList type={VideoType.MusicVideo} />
       </div>
     </div>
   );
