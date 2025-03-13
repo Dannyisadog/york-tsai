@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "../components/Navbar";
 import styles from "./layout.module.css";
 import { SessionProvider } from "next-auth/react";
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +31,12 @@ export default function RootLayout({
       <body
         className={`${styles.container} ${geistSans.variable} ${geistMono.variable}`}
       >
-        <SessionProvider>
-          <Navbar />
-          {children}
-        </SessionProvider>
+        <AppRouterCacheProvider>
+          <SessionProvider>
+            <Navbar />
+            {children}
+          </SessionProvider>
+        </AppRouterCacheProvider>
       </body>
     </html>
   );
