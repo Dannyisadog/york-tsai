@@ -4,7 +4,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } f
 const axiosInstance: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || '',
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json', // Default content type
   },
 });
 
@@ -16,6 +16,12 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Allow content type override from config
+    if (config.headers?.['Content-Type']) {
+      config.headers['Content-Type'] = config.headers['Content-Type'];
+    }
+    
     return config;
   },
   (error: AxiosError) => {
