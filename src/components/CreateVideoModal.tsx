@@ -6,17 +6,16 @@ import {
   Typography,
   FormControl,
   Stack,
-  IconButton
 } from '@mui/material';
 
 import { VideoType } from '@prisma/client';
-import AddIcon from '@mui/icons-material/Add';
 import { TextField } from './TextField';
 import { Select } from './Select';
 import { Modal } from './Modal';
 import { OutlinedButton } from './OutlinedButton';
 import { ContainedButton } from './ContainedButton';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { UploadImageBox } from './UploadImageBox';
+import { createVideo } from '@/api/video';
 
 interface CreateVideoModalProps {
   open: boolean;
@@ -24,25 +23,19 @@ interface CreateVideoModalProps {
 }
 
 export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
+  const [titleError, setTitleError] = useState<string | undefined>(undefined);
+  const [coverImageError, setCoverImageError] = useState<string | undefined>(undefined);
+  const [youtubeLinkError, setYoutubeLinkError] = useState<string | undefined>(undefined);
+
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     youtube_link: '',
-    video_type: 'Commercial',
-    thumbnail: null as File | null,
-    related_images: [] as File[]
+    video_type: 'Commercial' as VideoType,
+    thumbnail: "",
+    related_images: [] as string[]
   });
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>, type: 'thumbnail' | 'related') => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (type === 'thumbnail') {
-        setFormData({ ...formData, thumbnail: file });
-      } else {
-        setFormData({ ...formData, related_images: [...formData.related_images, file] });
-      }
-    }
-  };
 
   const handleRemoveRelatedImage = (index: number) => {
     setFormData({
@@ -52,9 +45,27 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setTitleError(formData.title ? undefined : '標題不能為空');
+    setCoverImageError(formData.thumbnail ? undefined : '封面縮圖不能為空');
+    setYoutubeLinkError(formData.youtube_link ? undefined : 'YouTube 連結不能為空');
+
+    if (!formData.title || !formData.thumbnail || !formData.youtube_link) {
+      return;
+    }
+
     e.preventDefault();
-    // TODO: Implement form submission
+    setIsLoading(true);
+    await createVideo({
+      title: formData.title,
+      description: formData.description,
+      youtubeLink: formData.youtube_link,
+      coverImage: formData.thumbnail,
+      videoType: formData.video_type,
+      relatedImages: formData.related_images
+    });
     onClose();
+    setIsLoading(false);
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -63,9 +74,12 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
       description: '',
       youtube_link: '',
       video_type: 'Commercial',
-      thumbnail: null,
+      thumbnail: "",
       related_images: []
     });
+    setTitleError(undefined);
+    setCoverImageError(undefined);
+    setYoutubeLinkError(undefined);
   }, [open]);
 
   return (
@@ -81,6 +95,7 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
             label="標題"
             value={formData.title}
             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            error={titleError}
           />
 
           <TextField
@@ -91,57 +106,21 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
 
           <Box>
             <Typography variant="subtitle2" sx={{ color: '#999', mb: 1 }}>封面縮圖</Typography>
-            <Box
-              component="label"
-              sx={{
-                width: '100%',
-                height: 200,
-                border: '2px dashed #fff',
-                borderRadius: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                transition: 'border-color 0.2s',
-                position: 'relative',
-                '&:hover': {
-                  borderColor: '#666',
-                },
+            <UploadImageBox
+              title="封面縮圖"
+              imageUrl={formData.thumbnail}
+              onUploaded={(imageUrl) => {
+                setFormData({ ...formData, thumbnail: imageUrl });
               }}
-            >
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleImageUpload(e, 'thumbnail')}
-                style={{ display: 'none' }}
-              />
-              {formData.thumbnail ? (
-                <Box
-                  component="img"
-                  src={URL.createObjectURL(formData.thumbnail)}
-                  alt="Thumbnail preview"
-                  sx={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    borderRadius: 1,
-                  }}
-                />
-              ) : (
-                <Box sx={{ textAlign: 'center' }}>
-                  <AddIcon sx={{ fontSize: 40, color: 'white', mb: 1 }} />
-                  <Typography color="white">
-                    上傳封面縮圖
-                  </Typography>
-                </Box>
-              )}
-            </Box>
+              error={coverImageError}
+            />
           </Box>
 
           <TextField
             label="YouTube 連結"
             value={formData.youtube_link}
             onChange={(e) => setFormData({ ...formData, youtube_link: e.target.value })}
+            error={youtubeLinkError}
           />
 
           <FormControl fullWidth>
@@ -152,79 +131,28 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
             <Typography variant="subtitle2" sx={{ color: '#999', mb: 1 }}>相關圖片</Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
               {formData.related_images.map((image, index) => (
-                <Box
+                <UploadImageBox
                   key={index}
-                  sx={{
-                    position: 'relative',
-                    width: '100%',
-                    height: 150,
-                    border: '2px solid #333',
-                    borderRadius: 2,
-                    overflow: 'hidden',
+                  title="相關圖片"
+                  imageUrl={image}
+                  onRemove={() => handleRemoveRelatedImage(index)}
+                  onUploaded={(imageUrl) => {
+                    setFormData({ ...formData, related_images: [...formData.related_images, imageUrl] });
                   }}
-                >
-                  <Box
-                    component="img"
-                    src={URL.createObjectURL(image)}
-                    alt={`Related image ${index + 1}`}
-                    sx={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
-                  />
-                  <IconButton
-                    onClick={() => handleRemoveRelatedImage(index)}
-                    sx={{
-                      position: 'absolute',
-                      top: 8,
-                      right: 8,
-                      bgcolor: 'rgba(0, 0, 0, 0.5)',
-                      '&:hover': {
-                        bgcolor: 'rgba(0, 0, 0, 0.7)',
-                      },
-                    }}
-                  >
-                    <DeleteIcon sx={{ color: 'white' }} />
-                  </IconButton>
-                </Box>
-              ))}
-              <Box
-                component="label"
-                sx={{
-                  width: '100%',
-                  height: 150,
-                  border: '2px dashed #fff',
-                  borderRadius: 2,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'border-color 0.2s',
-                  '&:hover': {
-                    borderColor: '#666',
-                  },
-                }}
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageUpload(e, 'related')}
-                  style={{ display: 'none' }}
                 />
-                <Box sx={{ textAlign: 'center' }}>
-                  <AddIcon sx={{ fontSize: 40, color: 'white', mb: 1 }} />
-                  <Typography color="white">
-                    上傳相關圖片
-                  </Typography>
-                </Box>
-              </Box>
+              ))}
+              <UploadImageBox
+                title="相關圖片"
+                onUploaded={(imageUrl) => {
+                  setFormData({ ...formData, related_images: [...formData.related_images, imageUrl] });
+                }}
+              />
             </Box>
           </Box>
 
           <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
             <OutlinedButton onClick={onClose}>取消</OutlinedButton>
-            <ContainedButton onClick={handleSubmit}>新增影片</ContainedButton>
+            <ContainedButton onClick={handleSubmit} disabled={isLoading} isLoading={isLoading}>新增影片</ContainedButton>
           </Box>
         </Stack>
       </form>
