@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+env:
+  DATABASE_URL: mysql://user:password@localhost:3306/database
+
 jobs:
   build:
     runs-on: ubuntu-latest
