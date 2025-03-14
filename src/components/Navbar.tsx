@@ -68,7 +68,9 @@ export const Navbar = () => {
   const pathname = usePathname();
 
   return (
-    <Stack height={180} justifyContent="center" spacing={4}>
+    <Stack justifyContent="center" spacing={4} style={{
+      marginTop: "64px",
+    }}>
       <nav
         style={{
           display: "flex",
@@ -115,7 +117,7 @@ export const Navbar = () => {
       </nav>
       {
         session && <>
-          <Button variant="contained" style={{
+          <Button variant="contained" sx={{
             width: 120,
             backgroundColor: "black",
             boxShadow: "0 0 10px 0 rgba(173, 173, 173, 0.5)",

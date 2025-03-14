@@ -5,6 +5,7 @@ import { Navbar } from "../components/Navbar";
 import styles from "./layout.module.css";
 import { SessionProvider } from "next-auth/react";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { Box } from "@mui/material";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,7 +35,11 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <SessionProvider>
             <Navbar />
-            {children}
+            <Box sx={{
+              mt: 4,
+            }}>
+              {children}
+            </Box>
           </SessionProvider>
         </AppRouterCacheProvider>
       </body>

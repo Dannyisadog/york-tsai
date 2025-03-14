@@ -4,19 +4,22 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import styles from "./signin.module.css";
 import { SyntheticEvent } from "react";
+import { ContainedButton } from "@/components/ContainedButton";
 
 export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     const result = await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
-
+    setIsLoading(false);
     if (result && !result.error) {
       window.location.href = "/";
     }
@@ -46,9 +49,9 @@ export default function SignInForm() {
             className={styles.input}
           />
         </label>
-        <button type="submit" className={styles.button}>
+        <ContainedButton isLoading={isLoading} type="submit" className={styles.button}>
           Sign In
-        </button>
+        </ContainedButton>
       </form>
     </div>
   );
