@@ -13,7 +13,11 @@ export const ContainedButton = (props: ContainedButtonProps) => {
       sx={{
         backgroundColor: 'white',
         color: 'black',
-        '&:hover': { backgroundColor: '#e0e0e0' }
+        '&:hover': { backgroundColor: '#e0e0e0' },
+        minHeight: 40,
+        "&:disabled": {
+          backgroundColor: "#a0a0a0",
+        }
       }}
       {...rest}
     >
