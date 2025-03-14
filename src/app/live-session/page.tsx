@@ -1,9 +1,10 @@
 import { VideoList } from "@/components/VideoList";
 import { VideoType } from "@prisma/client";
+import styles from "../page.module.css";
 export default function LiveSession() {
   return (
     <div>
-      <h1>Live Session</h1>
+      <h1 className={styles.page_title}>Live Session</h1>
       <div
         style={{
           marginTop: 40,

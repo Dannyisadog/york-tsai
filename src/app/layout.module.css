@@ -1,4 +1,18 @@
 .container {
-  padding-left: 128px;
-  padding-right: 128px;
+  padding-left: 80px;
+  padding-right: 80px;
+}
+
+@media (max-width: 1000px) {
+  .container {
+    padding-left: 64px;
+    padding-right: 64px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }

@@ -2,13 +2,15 @@
 
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import React from "react";
-import styles from "./Navbar.module.css";
+import React, { useState } from "react";
+import styles from "./style/navbar.module.css";
 import { usePathname } from "next/navigation";
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Drawer, ListItem, List, Stack, Typography, ListItemText, IconButton } from "@mui/material";
 import { CreateVideoModal } from "./CreateVideoModal";
 import useDisclosure from "@/hooks/useDisclosure";
 import AddIcon from '@mui/icons-material/Add';
+import MenuIcon from '@mui/icons-material/Menu';
+
 const items = [
   {
     title: "Commercial",
@@ -64,13 +66,11 @@ const NavbarItem = (props: NavbarItemProps) => {
 export const Navbar = () => {
   const { data: session } = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
   return (
-    <Stack justifyContent="center" spacing={4} style={{
-      marginTop: "64px",
-    }}>
+    <Stack justifyContent="center" spacing={4} className={styles.navbar}>
       <nav
         style={{
           display: "flex",
@@ -79,11 +79,11 @@ export const Navbar = () => {
         }}
       >
         <Link href="/">
-          <span style={{ fontWeight: "bold", fontSize: "48px", color: "white" }}>
+          <span className={styles.navbar_title}>
             YORK TSAI
           </span>
         </Link>
-        <div>
+        <div className={styles.navbar_menu}>
           <ul
             style={{
               display: "flex",
@@ -114,6 +114,29 @@ export const Navbar = () => {
             )}
           </ul>
         </div>
+        <div className={styles.navbar_menu_icon}>
+          <IconButton onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <MenuIcon sx={{ color: 'white', fontSize: 24 }} />
+          </IconButton>
+        </div>
+        <Drawer open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} anchor="top">
+          <List sx={{
+            backgroundColor: "black",
+          }}
+          >
+            {items.map((item, index) => (
+              <Link key={index} href={item.href} onClick={() => setMobileMenuOpen(false)}>
+                <ListItem sx={{
+                  backgroundColor: "black",
+                  color: "white",
+                  mt: 1
+                }}>
+                  <ListItemText primary={item.title} />
+                </ListItem>
+              </Link>
+            ))}
+          </List>
+        </Drawer>
       </nav>
       {
         session && <>

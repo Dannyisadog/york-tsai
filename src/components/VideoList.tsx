@@ -2,6 +2,7 @@ import { listVideos } from "@/app/services/video.service";
 import { Box, Typography } from "@mui/material";
 import { VideoType } from "@prisma/client";
 import Link from "next/link";
+import styles from "./style/video.module.css";
 
 interface VideoItemProps {
   title: string;
@@ -79,13 +80,7 @@ export const VideoList = async (props: VideoListProps) => {
 
   return (
     <ul
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "16px",
-        listStyleType: "none",
-        padding: 0,
-      }}
+      className={styles.video_list}
     >
       {videos.map((video) => (
         <VideoItem

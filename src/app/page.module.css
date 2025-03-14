@@ -166,3 +166,22 @@ a.secondary {
     filter: invert();
   }
 }
+
+.page_title {
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+}
+
+@media (max-width: 1000px) {
+  .page_title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .page_title {
+    font-size: 20px;
+  }
+}
+
