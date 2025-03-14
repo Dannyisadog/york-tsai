@@ -1,9 +1,9 @@
 interface VideoPage {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export default async function VideoPage(props: VideoPage) {
   const { params } = await props;
-  const { id } = await params;
-  return <div>Video Page: {id}</div>;
+  const { slug } = await params;
+  return <div>Video Page: {slug}</div>;
 }

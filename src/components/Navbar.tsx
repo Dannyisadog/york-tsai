@@ -135,6 +135,19 @@ export const Navbar = () => {
                 </ListItem>
               </Link>
             ))}
+            {session && (
+              <ListItem sx={{
+                backgroundColor: "black",
+                color: "white",
+                mt: 1
+              }}
+                onClick={() => {
+                  signOut();
+                }}
+              >
+                <ListItemText primary="Logout" />
+              </ListItem>
+            )}
           </List>
         </Drawer>
       </nav>
