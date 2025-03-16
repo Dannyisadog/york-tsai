@@ -1,7 +1,9 @@
-import { listVideos } from "@/app/services/video.service";
 import { Box, Typography } from "@mui/material";
-import { VideoType } from "@prisma/client";
+
 import Link from "next/link";
+import { VideoType } from "@prisma/client";
+import { isMobile } from "react-device-detect";
+import { listVideos } from "@/app/services/video.service";
 import styles from "./style/video.module.css";
 
 interface VideoItemProps {
@@ -38,7 +40,7 @@ const VideoItem = (props: VideoItemProps) => {
             transition: "transform 0.3s ease-in-out",
             "&:hover": {
               transform: "scale(1.1)",
-            }
+            },
           }}
         />
         <Box
@@ -55,13 +57,16 @@ const VideoItem = (props: VideoItemProps) => {
             opacity: 0,
             transition: "opacity 0.3s ease-in-out",
             "&:hover": {
-              opacity: 1
-            }
+              opacity: isMobile ? 0 : 1,
+            },
           }}
         >
-          <Typography variant="h3" sx={{
-            padding: 2
-          }}>
+          <Typography
+            variant="h5"
+            sx={{
+              padding: 2,
+            }}
+          >
             {title}
           </Typography>
         </Box>
@@ -78,15 +83,31 @@ export const VideoList = async (props: VideoListProps) => {
   const { type } = props;
   const videos = await listVideos(type);
 
+  const getVideoTypePath = (type: VideoType) => {
+    switch (type) {
+      case VideoType.Commercial:
+        return "/commercial";
+      case VideoType.MusicVideo:
+        return "/music-video";
+      case VideoType.LiveSession:
+        return "/live-session";
+      case VideoType.Concert:
+        return "/concert";
+      case VideoType.Highlight:
+        return "/highlight";
+      case VideoType.ReelsAndShorts:
+        return "/reels-shorts";
+      default:
+        return "/";
+    }
+  };
   return (
-    <ul
-      className={styles.video_list}
-    >
+    <ul className={styles.video_list}>
       {videos.map((video) => (
         <VideoItem
           key={video.id}
           title={video.title}
-          href={`/video/${video.id}`}
+          href={`${getVideoTypePath(video.video_type)}/${video.id}`}
           imageUrl={video.cover_image}
         />
       ))}
