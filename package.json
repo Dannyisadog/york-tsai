@@ -24,6 +24,7 @@
     "oci-common": "^2.105.0",
     "oci-objectstorage": "^2.105.0",
     "react": "^19.0.0",
+    "react-device-detect": "^2.2.3",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
