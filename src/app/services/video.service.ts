@@ -1,4 +1,10 @@
-import { PrismaClient, Video, VideoImage, VideoType } from "@prisma/client";
+import {
+  Prisma,
+  PrismaClient,
+  Video,
+  VideoImage,
+  VideoType,
+} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -12,11 +18,23 @@ export const listVideos = async (type: VideoType): Promise<Video[]> => {
     },
   });
   return videos;
-}
+};
 
-export const getVideo = async (id: string): Promise<Video> => {
+type VideoWithImages = Prisma.VideoGetPayload<{
+  include: {
+    images: true;
+  };
+}>;
+
+export const getVideo = async (
+  id: string,
+  video_type: VideoType
+): Promise<VideoWithImages> => {
   const video = await prisma.video.findUnique({
-    where: { id },
+    where: { id, video_type },
+    include: {
+      images: true,
+    },
   });
 
   if (!video) {
@@ -24,7 +42,7 @@ export const getVideo = async (id: string): Promise<Video> => {
   }
 
   return video;
-}
+};
 
 export interface CreateVideo {
   title: string;
@@ -45,27 +63,31 @@ export const createVideo = async (params: CreateVideo): Promise<Video> => {
       video_type: params.videoType,
     },
   });
-  
-  await Promise.all(params.relatedImages.map(async (image) => {
-    return await createVideoImage({
-      video_id: createdVideo.id,
-      image_url: image,
-    });
-  }));
+
+  await Promise.all(
+    params.relatedImages.map(async (image) => {
+      return await createVideoImage({
+        video_id: createdVideo.id,
+        image_url: image,
+      });
+    })
+  );
   return createdVideo;
-}
+};
 
 interface CreateVideoImage {
   video_id: string;
   image_url: string;
 }
 
-export const createVideoImage = async (data: CreateVideoImage): Promise<VideoImage> => {
+export const createVideoImage = async (
+  data: CreateVideoImage
+): Promise<VideoImage> => {
   const createdVideoImage = await prisma.videoImage.create({
     data,
   });
   return createdVideoImage;
-}
+};
 
 export const updateVideo = async (id: string, video: Video): Promise<Video> => {
   const updatedVideo = await prisma.video.update({
@@ -73,12 +95,11 @@ export const updateVideo = async (id: string, video: Video): Promise<Video> => {
     data: video,
   });
   return updatedVideo;
-}
+};
 
 export const deleteVideo = async (id: string): Promise<void> => {
   await prisma.video.update({
     where: { id },
     data: { is_deleted: true },
   });
-}
-
+};
