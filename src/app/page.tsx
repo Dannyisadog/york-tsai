@@ -1,3 +1,5 @@
+export const fetchCache = "force-no-store";
+
 import { VideoList } from "@/components/VideoList";
 import { VideoType } from "@prisma/client";
 import styles from "./page.module.css";
