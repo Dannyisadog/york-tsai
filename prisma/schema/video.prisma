@@ -1,7 +1,7 @@
 model Video {
   id           String    @id @default(uuid())
   title        String
-  description  String
+  description  String    @db.Text
   youtube_link String
   cover_image  String
   video_type   VideoType
