@@ -15,7 +15,7 @@ import { Modal } from './Modal';
 import { OutlinedButton } from './OutlinedButton';
 import { ContainedButton } from './ContainedButton';
 import { UploadImageBox } from './UploadImageBox';
-import { createVideo } from '@/api/video';
+import { clearCache, createVideo } from '@/api/video';
 
 interface CreateVideoModalProps {
   open: boolean;
@@ -65,6 +65,7 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
     });
     onClose();
     setIsLoading(false);
+    await clearCache();
     window.location.reload();
   };
 
