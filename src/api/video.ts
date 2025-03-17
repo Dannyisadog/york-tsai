@@ -6,4 +6,7 @@ export const createVideo = async (params: CreateVideo) => {
   return response.data;
 };
 
-
+export const clearCache = async () => {
+  const response = await HttpRequest.post('/api/cache');
+  return response.data;
+};
