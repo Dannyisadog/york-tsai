@@ -1,13 +1,20 @@
-import { UploadObjectResp } from "@/app/services/oracle-object-storage.service";
-import HttpRequest from "@/utils/httpRequest";
+export const uploadImage = async (par: string, file: File): Promise<string> => {
+  const fileName = `${Date.now()}-${file.name}`;
+  const url = `${par}${fileName}`;
 
-export const uploadImage = async (file: File): Promise<UploadObjectResp> => {
-  const formData = new FormData();
-  formData.append('image', file);
-  const response = await HttpRequest.post('/api/image', formData, {
+  const response = await fetch(url, {
+    method: "PUT",
+    body: await file.arrayBuffer(), // 直接傳遞 binary data
     headers: {
-      'Content-Type': 'multipart/form-data',
-    },  
+      "Content-Type": file.type, // 設定正確的 Content-Type
+      "Content-Length": file.size.toString(),
+    },
   });
-  return response.data as UploadObjectResp;
+
+  if (!response.ok) {
+    throw new Error(`Failed to upload image: ${response.statusText}`);
+  }
+
+  const encodedFileName = encodeURIComponent(fileName);
+  return encodedFileName;
 };
