@@ -37,7 +37,10 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
     youtube_link: "",
     video_type: "Commercial" as VideoType,
     thumbnail: "",
-    related_images: [] as string[],
+    related_images: [] as Array<{
+      url: string;
+      order: number;
+    }>,
   });
 
   const handleRemoveRelatedImage = (index: number) => {
@@ -47,6 +50,113 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
     });
   };
 
+<<<<<<< HEAD
+=======
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = formData.related_images.findIndex(
+        (_, index) => `image-${index}` === active.id
+      );
+      const newIndex = formData.related_images.findIndex(
+        (_, index) => `image-${index}` === over.id
+      );
+
+      const newRelatedImages = arrayMove(
+        formData.related_images,
+        oldIndex,
+        newIndex
+      );
+      // Update the order field after reordering
+      const updatedRelatedImages = newRelatedImages.map((image, index) => ({
+        ...image,
+        order: index,
+      }));
+
+      setFormData({
+        ...formData,
+        related_images: updatedRelatedImages,
+      });
+    }
+  };
+
+  const SortableItem = ({
+    id,
+    image,
+    index,
+  }: {
+    id: string;
+    image: { url: string; order: number };
+    index: number;
+  }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition: transition || "transform 200ms ease, box-shadow 200ms ease",
+      zIndex: isDragging ? 1 : 0,
+      opacity: isDragging ? 0.8 : 1,
+      cursor: "grab",
+      transformOrigin: "center center",
+      "&:active": {
+        cursor: "grabbing",
+      },
+      "&:hover": {
+        transform: isDragging ? undefined : "scale(1.02)",
+        boxShadow: isDragging
+          ? "0 8px 16px rgba(0,0,0,0.1)"
+          : "0 4px 8px rgba(0,0,0,0.1)",
+      },
+    };
+
+    return (
+      <Box
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        sx={{
+          transition: "all 0.2s ease",
+          transformOrigin: "center center",
+          "&:hover": {
+            transform: "scale(1.02)",
+            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+          },
+          "&:active": {
+            cursor: "grabbing",
+          },
+          aspectRatio: "16 / 9",
+        }}
+      >
+        <UploadImageBox
+          par={par}
+          bucketUrl={bucketUrl}
+          title="相關圖片"
+          imageUrl={image.url}
+          onRemove={() => handleRemoveRelatedImage(index)}
+          onUploaded={(imageUrl) => {
+            setFormData({
+              ...formData,
+              related_images: [
+                ...formData.related_images,
+                { url: imageUrl, order: formData.related_images.length },
+              ],
+            });
+          }}
+        />
+      </Box>
+    );
+  };
+
+>>>>>>> 6757f19 (feat(video): update CreateVideoModal to manage related images with order and improve drag-and-drop functionality)
   const handleSubmit = async (e: React.FormEvent) => {
     setTitleError(formData.title ? undefined : "標題不能為空");
     setCoverImageError(formData.thumbnail ? undefined : "封面縮圖不能為空");
@@ -136,16 +246,18 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
             <Typography variant="subtitle2" sx={{ color: "#999", mb: 1 }}>
               封面縮圖
             </Typography>
-            <UploadImageBox
-              par={par}
-              bucketUrl={bucketUrl}
-              title="封面縮圖"
-              imageUrl={formData.thumbnail}
-              onUploaded={(imageUrl) => {
-                setFormData({ ...formData, thumbnail: imageUrl });
-              }}
-              error={coverImageError}
-            />
+            <Box sx={{ aspectRatio: "16 / 9" }}>
+              <UploadImageBox
+                par={par}
+                bucketUrl={bucketUrl}
+                title="封面縮圖"
+                imageUrl={formData.thumbnail}
+                onUploaded={(imageUrl) => {
+                  setFormData({ ...formData, thumbnail: imageUrl });
+                }}
+                error={coverImageError}
+              />
+            </Box>
           </Box>
 
           <TextField
@@ -196,20 +308,46 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
                       related_images: [...formData.related_images, imageUrl],
                     });
                   }}
-                />
-              ))}
-              <UploadImageBox
-                par={par}
-                bucketUrl={bucketUrl}
-                title="相關圖片"
-                onUploaded={(imageUrl) => {
-                  setFormData({
-                    ...formData,
-                    related_images: [...formData.related_images, imageUrl],
-                  });
-                }}
-              />
-            </Box>
+                >
+                  {formData.related_images.map((image, index) => (
+                    <SortableItem
+                      key={`image-${index}`}
+                      id={`image-${index}`}
+                      image={image}
+                      index={index}
+                    />
+                  ))}
+                  <Box
+                    sx={{
+                      transition: "all 0.2s ease",
+                      "&:hover": {
+                        transform: "scale(1.02)",
+                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                      },
+                      aspectRatio: "16 / 9",
+                    }}
+                  >
+                    <UploadImageBox
+                      par={par}
+                      bucketUrl={bucketUrl}
+                      title="相關圖片"
+                      onUploaded={(imageUrl) => {
+                        setFormData({
+                          ...formData,
+                          related_images: [
+                            ...formData.related_images,
+                            {
+                              url: imageUrl,
+                              order: formData.related_images.length,
+                            },
+                          ],
+                        });
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </SortableContext>
+            </DndContext>
           </Box>
 
           <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
