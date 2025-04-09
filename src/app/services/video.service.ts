@@ -41,6 +41,8 @@ export const getVideo = async (
     throw new Error("Video not found");
   }
 
+  // Sort images by order
+  video.images.sort((a, b) => a.order - b.order);
   return video;
 };
 
@@ -50,7 +52,10 @@ export interface CreateVideo {
   youtubeLink: string;
   coverImage: string;
   videoType: VideoType;
-  relatedImages: string[];
+  relatedImages: Array<{
+    url: string;
+    order: number;
+  }>;
 }
 
 export const createVideo = async (params: CreateVideo): Promise<Video> => {
@@ -68,7 +73,8 @@ export const createVideo = async (params: CreateVideo): Promise<Video> => {
     params.relatedImages.map(async (image) => {
       return await createVideoImage({
         video_id: createdVideo.id,
-        image_url: image,
+        image_url: image.url,
+        order: image.order,
       });
     })
   );
@@ -78,6 +84,7 @@ export const createVideo = async (params: CreateVideo): Promise<Video> => {
 interface CreateVideoImage {
   video_id: string;
   image_url: string;
+  order: number;
 }
 
 export const createVideoImage = async (
