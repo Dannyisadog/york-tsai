@@ -1,32 +1,58 @@
+"use client";
+
 import { Box, Container, Typography } from "@mui/material";
 
-import { convertPathToVideoType } from "@/utils";
-import { getVideo } from "@/app/services/video.service";
-import styles from "./page.module.css";
+import { ContainedButton } from "@/components/ContainedButton";
+import { EditVideoModal } from "@/components/EditVideoModal";
+import styles from "../app/[...slug]/page.module.css";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
 
-interface VideoPageProps {
-  params: Promise<{ video_type: string; slug: string }>;
+interface VideoPageContentProps {
+  videoData: {
+    id: string;
+    title: string;
+    description: string;
+    youtube_link: string;
+    video_type: string;
+    cover_image: string;
+    images: Array<{
+      id: string;
+      image_url: string;
+      order: number;
+    }>;
+  };
 }
 
-export default async function VideoPage(props: VideoPageProps) {
-  const { params } = props;
-  const { video_type, slug } = await params;
-  const videoId = slug[0];
-  const videoType = convertPathToVideoType(video_type);
-  const videoData = await getVideo(videoId, videoType);
+export const VideoPageContent = ({ videoData }: VideoPageContentProps) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { data: session } = useSession();
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography
-        variant="h4"
-        component="h1"
-        gutterBottom
+      <Box
         sx={{
-          fontWeight: "bold",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 4,
         }}
       >
-        {videoData.title}
-      </Typography>
+        <Typography
+          variant="h4"
+          component="h1"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
+          {videoData.title}
+        </Typography>
+        {session && (
+          <ContainedButton onClick={() => setIsEditModalOpen(true)}>
+            編輯影片
+          </ContainedButton>
+        )}
+      </Box>
 
       <Box sx={{ mb: 4, position: "relative", paddingTop: "56.25%" }}>
         <Box
@@ -75,6 +101,12 @@ export default async function VideoPage(props: VideoPageProps) {
           ))}
         </ul>
       </Box>
+
+      <EditVideoModal
+        open={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        videoData={videoData}
+      />
     </Container>
   );
-}
+};

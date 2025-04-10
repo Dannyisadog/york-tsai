@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, FormControl, Stack, Typography } from "@mui/material";
+import { Box, FormControl, Grid, Stack, Typography } from "@mui/material";
 import { DndContext, DragEndEvent, closestCenter } from "@dnd-kit/core";
 import { PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import {
@@ -9,7 +9,7 @@ import {
   rectSortingStrategy,
   useSortable,
 } from "@dnd-kit/sortable";
-import { clearCache, createVideo } from "@/api/video";
+import { clearCache, updateVideo } from "@/api/video";
 import { useEffect, useState } from "react";
 
 import { CSS } from "@dnd-kit/utilities";
@@ -27,12 +27,29 @@ const items = Object.values(VideoType).map((type) => ({
   label: type,
 }));
 
-interface CreateVideoModalProps {
+interface EditVideoModalProps {
   open: boolean;
   onClose: () => void;
+  videoData: {
+    id: string;
+    title: string;
+    description: string;
+    youtube_link: string;
+    video_type: string;
+    cover_image: string;
+    images: Array<{
+      id: string;
+      image_url: string;
+      order: number;
+    }>;
+  };
 }
 
-export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
+export const EditVideoModal = ({
+  open,
+  onClose,
+  videoData,
+}: EditVideoModalProps) => {
   const [titleError, setTitleError] = useState<string | undefined>(undefined);
   const [coverImageError, setCoverImageError] = useState<string | undefined>(
     undefined
@@ -46,15 +63,15 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    youtube_link: "",
-    video_type: "Commercial" as VideoType,
-    thumbnail: "",
-    related_images: [] as Array<{
-      url: string;
-      order: number;
-    }>,
+    title: videoData.title,
+    description: videoData.description,
+    youtube_link: videoData.youtube_link,
+    video_type: videoData.video_type as VideoType,
+    thumbnail: videoData.cover_image,
+    related_images: videoData.images.map((image) => ({
+      url: image.image_url,
+      order: image.order,
+    })),
   });
 
   const sensors = useSensors(
@@ -88,7 +105,6 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
         oldIndex,
         newIndex
       );
-      // Update the order field after reordering
       const updatedRelatedImages = newRelatedImages.map((image, index) => ({
         ...image,
         order: index,
@@ -193,7 +209,7 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
 
     e.preventDefault();
     setIsLoading(true);
-    await createVideo({
+    await updateVideo(videoData.id, {
       title: formData.title,
       description: formData.description,
       youtubeLink: formData.youtube_link,
@@ -208,18 +224,23 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
   };
 
   useEffect(() => {
-    setFormData({
-      title: "",
-      description: "",
-      youtube_link: "",
-      video_type: "Commercial",
-      thumbnail: "",
-      related_images: [],
-    });
-    setTitleError(undefined);
-    setCoverImageError(undefined);
-    setYoutubeLinkError(undefined);
-  }, [open]);
+    if (open) {
+      setFormData({
+        title: videoData.title,
+        description: videoData.description,
+        youtube_link: videoData.youtube_link,
+        video_type: videoData.video_type as VideoType,
+        thumbnail: videoData.cover_image,
+        related_images: videoData.images.map((image) => ({
+          url: image.image_url,
+          order: image.order,
+        })),
+      });
+      setTitleError(undefined);
+      setCoverImageError(undefined);
+      setYoutubeLinkError(undefined);
+    }
+  }, [open, videoData]);
 
   useEffect(() => {
     if (!open) {
@@ -241,10 +262,10 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
 
   return (
     <Modal
-      title="新增影片"
+      title="編輯影片"
       open={open}
       onClose={onClose}
-      aria-labelledby="create-video-modal"
+      aria-labelledby="edit-video-modal"
     >
       <form onSubmit={handleSubmit}>
         <Stack spacing={3}>
@@ -256,34 +277,15 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
             }
             error={titleError}
           />
-
           <TextField
-            label="敘述"
+            label="描述"
             value={formData.description}
             onChange={(e) =>
               setFormData({ ...formData, description: e.target.value })
             }
+            multiline
+            rows={4}
           />
-
-          <Box>
-            <Typography variant="subtitle2" sx={{ color: "#999", mb: 1 }}>
-              封面縮圖
-            </Typography>
-            <Box sx={{ aspectRatio: "16 / 9" }}>
-              <UploadImageBox
-                par={par}
-                bucketUrl={bucketUrl}
-                title="封面縮圖"
-                imageUrl={formData.thumbnail}
-                onUploaded={(imageUrl) => {
-                  setFormData({ ...formData, thumbnail: imageUrl });
-                }}
-                error={coverImageError}
-                fixedHeight={true}
-              />
-            </Box>
-          </Box>
-
           <TextField
             label="YouTube 連結"
             value={formData.youtube_link}
@@ -292,8 +294,7 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
             }
             error={youtubeLinkError}
           />
-
-          <FormControl fullWidth>
+          <FormControl>
             <Select
               label="影片類型"
               value={formData.video_type}
@@ -306,9 +307,29 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
               items={items}
             />
           </FormControl>
-
           <Box>
-            <Typography variant="subtitle2" sx={{ color: "#999", mb: 1 }}>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+              封面縮圖
+            </Typography>
+            {par && bucketUrl && (
+              <UploadImageBox
+                par={par}
+                bucketUrl={bucketUrl}
+                title="封面縮圖"
+                imageUrl={formData.thumbnail}
+                onUploaded={(imageUrl) =>
+                  setFormData({ ...formData, thumbnail: imageUrl })
+                }
+              />
+            )}
+            {coverImageError && (
+              <Typography color="error" variant="caption">
+                {coverImageError}
+              </Typography>
+            )}
+          </Box>
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>
               相關圖片
             </Typography>
             <DndContext
@@ -322,37 +343,21 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
                 )}
                 strategy={rectSortingStrategy}
               >
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(2, 1fr)",
-                    gap: 2,
-                    minHeight: "100px",
-                  }}
-                >
+                <Grid container spacing={2}>
                   {formData.related_images.map((image, index) => (
-                    <SortableItem
-                      key={`image-${index}`}
-                      id={`image-${index}`}
-                      image={image}
-                      index={index}
-                    />
+                    <Grid item xs={6} key={`image-${index}`}>
+                      <SortableItem
+                        id={`image-${index}`}
+                        image={image}
+                        index={index}
+                      />
+                    </Grid>
                   ))}
-                  <Box
-                    sx={{
-                      transition: "all 0.2s ease",
-                      "&:hover": {
-                        transform: "scale(1.02)",
-                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                      },
-                      width: "100%",
-                      aspectRatio: "16/9",
-                    }}
-                  >
+                  <Grid item xs={6}>
                     <UploadImageBox
                       par={par}
                       bucketUrl={bucketUrl}
-                      title="相關圖片"
+                      title="新增相關圖片"
                       onUploaded={(imageUrl) => {
                         setFormData({
                           ...formData,
@@ -366,20 +371,15 @@ export const CreateVideoModal = ({ open, onClose }: CreateVideoModalProps) => {
                         });
                       }}
                     />
-                  </Box>
-                </Box>
+                  </Grid>
+                </Grid>
               </SortableContext>
             </DndContext>
           </Box>
-
           <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
             <OutlinedButton onClick={onClose}>取消</OutlinedButton>
-            <ContainedButton
-              onClick={handleSubmit}
-              disabled={isLoading}
-              isLoading={isLoading}
-            >
-              新增影片
+            <ContainedButton type="submit" disabled={isLoading}>
+              {isLoading ? "儲存中..." : "儲存"}
             </ContainedButton>
           </Box>
         </Stack>
