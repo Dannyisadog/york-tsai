@@ -29,7 +29,7 @@ export const VideoPageContent = ({ videoData }: VideoPageContentProps) => {
   const { data: session } = useSession();
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container sx={{ py: 4 }}>
       <Box
         sx={{
           display: "flex",

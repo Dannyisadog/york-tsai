@@ -1,7 +1,7 @@
 .image_list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 4px;
 }
 
 .image_list li {
