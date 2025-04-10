@@ -26,12 +26,9 @@ type VideoWithImages = Prisma.VideoGetPayload<{
   };
 }>;
 
-export const getVideo = async (
-  id: string,
-  video_type: VideoType
-): Promise<VideoWithImages> => {
+export const getVideo = async (id: string): Promise<VideoWithImages> => {
   const video = await prisma.video.findUnique({
-    where: { id, video_type },
+    where: { id },
     include: {
       images: true,
     },
@@ -41,6 +38,7 @@ export const getVideo = async (
     throw new Error("Video not found");
   }
 
+  video.images.sort((a, b) => a.order - b.order);
   return video;
 };
 
@@ -50,7 +48,10 @@ export interface CreateVideo {
   youtubeLink: string;
   coverImage: string;
   videoType: VideoType;
-  relatedImages: string[];
+  relatedImages: Array<{
+    url: string;
+    order: number;
+  }>;
 }
 
 export const createVideo = async (params: CreateVideo): Promise<Video> => {
@@ -68,7 +69,8 @@ export const createVideo = async (params: CreateVideo): Promise<Video> => {
     params.relatedImages.map(async (image) => {
       return await createVideoImage({
         video_id: createdVideo.id,
-        image_url: image,
+        image_url: image.url,
+        order: image.order,
       });
     })
   );
@@ -78,6 +80,7 @@ export const createVideo = async (params: CreateVideo): Promise<Video> => {
 interface CreateVideoImage {
   video_id: string;
   image_url: string;
+  order: number;
 }
 
 export const createVideoImage = async (
@@ -89,11 +92,50 @@ export const createVideoImage = async (
   return createdVideoImage;
 };
 
-export const updateVideo = async (id: string, video: Video): Promise<Video> => {
+export interface UpdateVideo {
+  title: string;
+  description: string;
+  youtubeLink: string;
+  coverImage: string;
+  videoType: VideoType;
+  relatedImages: Array<{
+    url: string;
+    order: number;
+  }>;
+}
+
+export const updateVideo = async (
+  id: string,
+  video: UpdateVideo
+): Promise<Video> => {
+  // First update the video
   const updatedVideo = await prisma.video.update({
     where: { id },
-    data: video,
+    data: {
+      title: video.title,
+      description: video.description,
+      youtube_link: video.youtubeLink,
+      cover_image: video.coverImage,
+      video_type: video.videoType,
+    },
   });
+
+  // Delete existing images
+  await prisma.videoImage.deleteMany({
+    where: { video_id: id },
+  });
+
+  // Create new images
+  await Promise.all(
+    video.relatedImages.map(async (image) => {
+      return await createVideoImage({
+        video_id: id,
+        image_url: image.url,
+        order: image.order,
+      });
+    })
+  );
+
   return updatedVideo;
 };
 

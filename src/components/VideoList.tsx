@@ -85,31 +85,13 @@ export const VideoList = async (props: VideoListProps) => {
   const { type } = props;
   const videos = await listVideos(type);
 
-  const getVideoTypePath = (type: VideoType) => {
-    switch (type) {
-      case VideoType.Commercial:
-        return "/commercial";
-      case VideoType.MusicVideo:
-        return "/music-video";
-      case VideoType.LiveSession:
-        return "/live-session";
-      case VideoType.Concert:
-        return "/concert";
-      case VideoType.Highlight:
-        return "/highlight";
-      case VideoType.ReelsAndShorts:
-        return "/reels-shorts";
-      default:
-        return "/";
-    }
-  };
   return (
     <ul className={styles.video_list}>
       {videos.map((video) => (
         <VideoItem
           key={video.id}
           title={video.title}
-          href={`${getVideoTypePath(video.video_type)}/${video.id}`}
+          href={`/${video.id}`}
           imageUrl={video.cover_image}
         />
       ))}
