@@ -8,8 +8,16 @@ import {
 
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
+import imageCompression, { Options } from "browser-image-compression";
 import { uploadImage } from "@/api/image";
 import { useState } from "react";
+
+const options = {
+  maxSizeMB: 1,
+  maxWidthOrHeight: 1024,
+  useWebWorker: true,
+  initialQuality: 0.8,
+} satisfies Options;
 
 interface UploadImageBoxProps {
   title: string;
@@ -41,8 +49,9 @@ export const UploadImageBox = (props: UploadImageBoxProps) => {
   ) => {
     const file = event.target.files?.[0];
     if (file) {
+      const compressedFile = await imageCompression(file, options);
       setIsLoading(true);
-      const uploadImageResp = await uploadImage(par, file);
+      const uploadImageResp = await uploadImage(par, compressedFile);
       setCurrentImageUrl(`${bucketUrl}/${uploadImageResp}`);
       setIsLoading(false);
       onUploaded(`${bucketUrl}/${uploadImageResp}`);
