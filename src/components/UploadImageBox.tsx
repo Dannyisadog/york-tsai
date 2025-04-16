@@ -14,7 +14,7 @@ import { useState } from "react";
 
 const options = {
   maxSizeMB: 1,
-  maxWidthOrHeight: 1024,
+  maxWidthOrHeight: Number(process.env.NEXT_PUBLIC_MAX_WIDTH_OR_HEIGHT) || 4096,
   useWebWorker: true,
   initialQuality: 0.8,
 } satisfies Options;
