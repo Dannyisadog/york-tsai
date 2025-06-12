@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: "York Tsai",
   description: "York Tsai's personal website",
   verification: {
-    google: "F8Q35Z-IeSGB5BcabhxmtPLwyc5COuhoxhDX-ftq4Fk",
+    google: "69lQqBrBnSAYYBAYsDmRgHgsKlXPZNN-C4bCDOBJ_KU",
   },
 };
 
