@@ -20,6 +20,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "York Tsai",
   description: "York Tsai's personal website",
+  verification: {
+    google: "F8Q35Z-IeSGB5BcabhxmtPLwyc5COuhoxhDX-ftq4Fk",
+  },
 };
 
 export default function RootLayout({
